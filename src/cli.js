@@ -12,6 +12,7 @@ var stripJsonComments = require("strip-json-comments");
 var JSHINT            = require("./jshint.js").JSHINT;
 var defReporter       = require("./reporters/default").reporter;
 
+var preprocessors = [];
 var OPTIONS = {
   "config": ["c", "Custom configuration file", "string", false ],
   "reporter": ["reporter", "Custom reporter (<PATH>|jslint|checkstyle)", "string", undefined ],
@@ -481,6 +482,9 @@ function lint(code, results, config, data, file) {
   buffer.push(code);
   buffer = buffer.join("\n");
   buffer = buffer.replace(/^\uFEFF/, ""); // Remove potential Unicode BOM.
+  preprocessors.forEach(function(p) {
+    buffer = p(buffer);
+  });
 
   if (!JSHINT(buffer, config, globals)) {
     JSHINT.errors.forEach(function (err) {
@@ -647,6 +651,11 @@ var exports = {
   getBufferSize: function () {
     return process.stdout.bufferSize;
   },
+
+  addPreprocessor: function(processor) {
+    preprocessors.push(processor);
+    return this;
+   },
 
   /**
    * Main entrance function. Parses arguments and calls 'run' when

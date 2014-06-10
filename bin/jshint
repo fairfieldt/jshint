@@ -1,3 +1,4 @@
 #!/usr/bin/env node
 
-require("../src/cli.js").interpret(process.argv);
+var jsioPreprocessor = require("../src/jsioPreprocessor.js");
+require("../src/cli.js").addPreprocessor(jsioPreprocessor).interpret(process.argv);
